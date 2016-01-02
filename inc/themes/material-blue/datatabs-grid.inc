@@ -18,14 +18,6 @@
         <div id="tabs-<?php echo $index; ?>">
             <div class="action fullWidth">
                 <ul>
-                    <li>
-                        <button id="btnBack" type="button"
-                                class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored"
-                                OnClick="sysPassUtil.Common.doAction(<?php echo $lastAction; ?>, <?php echo $actionId; ?>, <?php echo $lastAccountId; ?>)"
-                                title="<?php echo _('Atrás'); ?>">
-                            <i class="material-icons">arrow_back</i>
-                        </button>
-                    </li>
                     <?php foreach ($data->getDataActions() as $action): ?>
                         <?php if ($action->getType() === \SP\Html\DataGrid\DataGridActionType::NEW_ITEM): ?>
                             <li>
@@ -43,7 +35,7 @@
                                 <form method="post" id="<?php echo $action->getName(); ?>"
                                       name="<?php echo $action->getName(); ?>"
                                       onsubmit="<?php echo $action->getOnSubmit(); ?>">
-                                    <i id="btnClear" class="material-icons" title="<?php echo _('Limpiar'); ?>" onclick="$('#<?php echo $action->getName(); ?>').trigger('reset').submit();">clear_all</i>
+                                    <i class="material-icons" title="<?php echo _('Limpiar'); ?>" onclick="$('#<?php echo $action->getName(); ?>').trigger('reset').submit();">clear_all</i>
                                     <div class="mdl-textfield mdl-js-textfield">
                                         <input class="mdl-textfield__input fg-blue100" type="text" id="txtSearch"
                                                name="search" value=""/>
@@ -59,6 +51,14 @@
                             </li>
                         <?php endif; ?>
                     <?php endforeach; ?>
+                    <li>
+                        <button type="button"
+                                class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored"
+                                OnClick="sysPassUtil.Common.doAction(<?php echo $lastAction; ?>, <?php echo $actionId; ?>, <?php echo $lastAccountId; ?>)"
+                                title="<?php echo _('Atrás'); ?>">
+                            <i class="material-icons">arrow_back</i>
+                        </button>
+                    </li>
                 </ul>
             </div>
 

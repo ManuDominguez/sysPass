@@ -38,7 +38,7 @@ sysPass.createNS('sysPass.Util');
 sysPass.Util.Common = function () {
     "use strict";
 
-    var APP_ROOT, LANG, PK;
+    var APP_ROOT, LANG, PK, MAX_FILE_SIZE;
 
     // Atributos de la ordenación de búsquedas
     var order = {key: 0, dir: 0};
@@ -164,6 +164,8 @@ sysPass.Util.Common = function () {
             return;
         }
 
+        //console.info($("#content").height());
+
         // Calculate total height for full body resize
         var totalHeight = $("#content").height() + 200;
         //var totalWidth = $("#wrap").width();
@@ -186,6 +188,7 @@ sysPass.Util.Common = function () {
         document.frmSearch.search.value = "";
         $('#frmSearch').find('select').prop('selectedIndex', 0).trigger("chosen:updated");
         $('#frmSearch').find('input[name="start"], input[name="skey"], input[name="sorder"]').val(0);
+        $('#frmSearch').find('input[name="searchfav"]').val(0).change();
         order.key = 0;
         order.dir = 0;
     };
@@ -245,7 +248,7 @@ sysPass.Util.Common = function () {
             data: frmData,
             success: function (json) {
                 $('#resBuscar').html(json.html);
-                $('#resBuscar').css("max-height", $('html').height() - windowAdjustSize);
+                //$('#resBuscar').css("max-height", $('html').height() - windowAdjustSize);
 
 
                 if (typeof json.sk !== 'undefined') {
@@ -255,10 +258,6 @@ sysPass.Util.Common = function () {
             },
             error: function () {
                 $('#resBuscar').html(resMsg("nofancyerror"));
-            },
-            complete: function () {
-                sysPassUtil.hideLoading();
-                scrollUp();
             }
         });
     };
@@ -288,13 +287,10 @@ sysPass.Util.Common = function () {
             data: {'start': start, 'current': current},
             success: function (response) {
                 $('#content').html(response);
+                scrollUp();
             },
             error: function () {
                 $('#content').html(resMsg("nofancyerror"));
-            },
-            complete: function () {
-                sysPassUtil.hideLoading();
-                scrollUp();
             }
         });
     };
@@ -666,128 +662,171 @@ sysPass.Util.Common = function () {
             });
     };
 
-    // Función para activar el Drag&Drop de archivos en las cuentas
-    var dropFile = function (accountId, sk, maxsize, actionId) {
-        var dropfiles = $('#dropzone');
-        var file_exts_ok = dropfiles.attr('data-files-ext').toLowerCase().split(',');
+    // Función para habilitar la subida de archivos en una zona o formulario
+    var fileUpload = function (opts) {
+        var options = {
+            targetId: '',
+            url: ''
+        };
 
-        dropfiles.filedrop({
-            fallback_id: 'inFile',
-            paramname: 'inFile',
-            maxfiles: 5,
-            maxfilesize: maxsize,
-            allowedfileextensions: file_exts_ok,
-            url: APP_ROOT + '/ajax/ajax_files.php',
-            data: {
-                sk: sk,
-                accountId: accountId,
-                actionId: actionId,
-                isAjax: 1
-            },
-            uploadFinished: function (i, file, response) {
-                sysPassUtil.hideLoading();
+        var requestDoneAction, requestData = {}, beforeSendAction;
 
-                if (response.status === 0) {
-                    var sk = $('input[name="sk"]').val();
-                    var url = APP_ROOT + "/ajax/ajax_getFiles.php?id=" + accountId + "&del=1&isAjax=1&sk=" + sk;
-                    $("#downFiles").load(url);
-
-                    resMsg("ok", response.description);
-                } else {
-                    resMsg("error", response.description);
-                }
+        var setFn = {
+            setRequestDoneAction: function (a) {
+                requestDoneAction = a;
             },
-            error: function (err, file) {
-                switch (err) {
-                    case 'BrowserNotSupported':
-                        resMsg("error", LANG[16]);
-                        break;
-                    case 'TooManyFiles':
-                        resMsg("error", LANG[17] + ' (max. ' + this.maxfiles + ')');
-                        break;
-                    case 'FileTooLarge':
-                        resMsg("error", LANG[18] + ' ' + maxsize + ' MB' + '<br>' + file.name);
-                        break;
-                    case 'FileExtensionNotAllowed':
-                        resMsg("error", LANG[19]);
-                        break;
-                    default:
-                        break;
-                }
+            setRequestData: function (d) {
+                requestData = d;
             },
-            uploadStarted: function (i, file, len) {
-                sysPassUtil.showLoading();
+            setBeforeSendAction: function (a) {
+                beforeSendAction = a;
             }
-        });
+        };
+
+        options = opts;
+
+        if (typeof options.targetId === "undefined" || options.targetId === "") {
+            return setFn;
+        }
+
+        var dropzone = document.getElementById(options.targetId);
+
+        // Subir un archivo
+        var sendFile = function (file) {
+            if (typeof options.url === "undefined" || options.url === "") {
+                return false;
+            }
+
+            // Objeto FormData para crear datos de un formulario
+            var fd = new FormData();
+            fd.append('inFile', file);
+            fd.append('isAjax', 1);
+
+            Object.keys(requestData).forEach(function (key) {
+                fd.append(key, requestData[key]);
+            });
+
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                cache: false,
+                processData: false,
+                contentType: false,
+                url: APP_ROOT + options.url,
+                data: fd,
+                success: function (json) {
+                    var status = json.status;
+                    var description = json.description;
+
+                    if (status === 0) {
+                        if (typeof requestDoneAction === "function") {
+                            requestDoneAction();
+                        }
+
+                        resMsg("ok", description);
+                    } else if (status === 10) {
+                        doLogout();
+                    } else {
+                        resMsg("error", description);
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    var txt = LANG[1] + '<p>' + errorThrown + textStatus + '</p>';
+                    resMsg("error", txt);
+                }
+            });
+        };
+
+        var checkFileSize = function (size) {
+            return (size / 1000 > MAX_FILE_SIZE);
+        };
+
+        var checkFileExtension = function (name) {
+            var file_exts_ok = dropzone.getAttribute('data-files-ext').toLowerCase().split(',');
+
+            for (var i = 0; i <= file_exts_ok.length; i++) {
+                if (name.indexOf(file_exts_ok[i]) !== -1) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+        // Comprobar los archivos y subirlos
+        var handleFiles = function (filesArray) {
+            if (filesArray.length > 5) {
+                resMsg("error", LANG[17] + ' (Max: 5)');
+                return;
+            }
+
+            for (var i = 0; i < filesArray.length; i++) {
+                var file = filesArray[i];
+                if (checkFileSize(file.size)) {
+                    resMsg("error", LANG[18] + '<br>' + file.name + ' (Max: ' + MAX_FILE_SIZE + ')');
+                } else if (!checkFileExtension(file.name)) {
+                    resMsg("error", LANG[19] + '<br>' + file.name);
+                } else {
+                    sendFile(filesArray[i]);
+                }
+            }
+        };
+
+        // Inicializar la zona de subida de archivos Drag&Drop
+        var init = function () {
+            dropzone.ondragover = dropzone.ondragenter = function (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            };
+
+            dropzone.ondrop = function (event) {
+                event.stopPropagation();
+                event.preventDefault();
+
+                if (typeof beforeSendAction === "function") {
+                    beforeSendAction();
+                }
+
+                handleFiles(event.dataTransfer.files);
+            };
+
+            var fallback = initForm(false);
+
+            dropzone.onclick = function () {
+                fallback.click();
+            };
+        };
+
+        // Inicializar el formulario de archivos en modo compatibilidad
+        var initForm = function (display) {
+            var form = document.getElementById("fileUploadForm");
+            var formTags = form.getElementsByTagName("input");
+
+            form.style.display = (display === false) ? 'none' : '';
+
+            if (formTags[0].type === "file") {
+                formTags[0].addEventListener("change", function () {
+                    if (typeof beforeSendAction === "function") {
+                        beforeSendAction();
+                    }
+
+                    handleFiles(this.files);
+                }, false);
+            }
+
+            return formTags[0];
+        };
+
+
+        if (window.File && window.FileList && window.FileReader) {
+            init();
+        } else {
+            initForm(true);
+        }
+
+        return setFn;
     };
 
-    // Función para activar el Drag&Drop de archivos en la importación de cuentas
-    var importFile = function (sk) {
-        var dropfiles = $('#dropzone');
-        var file_exts_ok = ['csv', 'xml'];
-
-        dropfiles.filedrop({
-            fallback_id: 'inFile',
-            paramname: 'inFile',
-            maxfiles: 1,
-            maxfilesize: 1,
-            allowedfileextensions: file_exts_ok,
-            url: APP_ROOT + '/ajax/ajax_import.php',
-            data: {
-                sk: sk,
-                action: 'import',
-                isAjax: 1,
-                importPwd: function () {
-                    return $('input[name="importPwd"]').val();
-                },
-                defUser: function () {
-                    return $('#import_defaultuser').chosen().val();
-                },
-                defGroup: function () {
-                    return $('#import_defaultgroup').chosen().val();
-                },
-                csvDelimiter: function () {
-                    return $('input[name="csvDelimiter"]').val();
-                }
-            },
-            uploadFinished: function (i, file, json) {
-                sysPassUtil.hideLoading();
-
-                var status = json.status;
-                var description = json.description;
-
-                if (status === 0) {
-                    resMsg("ok", description);
-                } else if (status === 10) {
-                    resMsg("error", description);
-                    doLogout();
-                } else {
-                    resMsg("error", description);
-                }
-            },
-            error: function (err, file) {
-                switch (err) {
-                    case 'BrowserNotSupported':
-                        resMsg("error", LANG[16]);
-                        break;
-                    case 'TooManyFiles':
-                        resMsg("error", LANG[17] + ' (max. ' + this.maxfiles + ')');
-                        break;
-                    case 'FileTooLarge':
-                        resMsg("error", LANG[18] + '<br>' + file.name);
-                        break;
-                    case 'FileExtensionNotAllowed':
-                        resMsg("error", LANG[19]);
-                        break;
-                    default:
-                        break;
-                }
-            },
-            uploadStarted: function (i, file, len) {
-                sysPassUtil.showLoading();
-            }
-        });
-    };
 
     // Función para realizar una petición ajax
     var sendAjax = function (data, url) {
@@ -931,7 +970,7 @@ sysPass.Util.Common = function () {
         return false;
     };
 
-    var appMgmtSearchAjax = function(data, targetId) {
+    var appMgmtSearchAjax = function (data, targetId) {
         $.ajax({
             type: 'POST',
             dataType: 'json',
@@ -947,9 +986,6 @@ sysPass.Util.Common = function () {
             },
             error: function () {
                 $('#' + targetId).html(resMsg('nofancyerror', 'error'));
-            },
-            complete: function (json) {
-                sysPassUtil.hideLoading();
             }
         });
     };
@@ -1046,28 +1082,30 @@ sysPass.Util.Common = function () {
     // Funciones para analizar al fortaleza de una clave
     // From http://net.tutsplus.com/tutorials/javascript-ajax/build-a-simple-password-strength-checker/
     var checkPassLevel = function (password, dst) {
-        var level = zxcvbn(password);
+        passwordData.passLength = password.length;
 
-        outputResult(level.score, dst);
+        outputResult(zxcvbn(password), dst);
     };
 
     var outputResult = function (level, dstId) {
         var complexity, selector = '.passLevel-' + dstId;
+        var score = level.score;
 
         complexity = $(selector);
+        complexity.show();
         complexity.removeClass("weak good strong strongest");
 
         if (passwordData.passLength === 0) {
             complexity.attr('title', '').empty();
         } else if (passwordData.passLength < passwordData.minPasswordLength) {
             complexity.attr('title', LANG[11]).addClass("weak");
-        } else if (level === 0) {
-            complexity.attr('title', LANG[9]).addClass("weak");
-        } else if (level === 1 || level === 2) {
-            complexity.attr('title', LANG[8]).addClass("good");
-        } else if (level === 3) {
+        } else if (score === 0) {
+            complexity.attr('title', LANG[9] + ' - ' + level.feedback.warning).addClass("weak");
+        } else if (score === 1 || score === 2) {
+            complexity.attr('title', LANG[8] + ' - ' + level.feedback.warning).addClass("good");
+        } else if (score === 3) {
             complexity.attr('title', LANG[7]).addClass("strong");
-        } else if (level === 4) {
+        } else if (score === 4) {
             complexity.attr('title', LANG[10]).addClass("strongest");
         }
     };
@@ -1355,6 +1393,10 @@ sysPass.Util.Common = function () {
      */
     var bindPassEncrypt = function () {
         $('body').delegate(':input[type=password]', 'blur', function (e) {
+            if ($(this).hasClass('passwordfield__no-pki')) {
+                return;
+            }
+
             var id = $(this).attr('id');
             encryptFormValue('#' + id);
         });
@@ -1374,7 +1416,6 @@ sysPass.Util.Common = function () {
 
     // Función para mostrar los datos de un registro
     var viewWiki = function (pageName, actionId, sk) {
-
         var data = {'pageName': pageName, 'actionId': actionId, 'sk': sk, 'isAjax': 1};
         var url = APP_ROOT + '/ajax/ajax_wiki.php';
 
@@ -1393,10 +1434,52 @@ sysPass.Util.Common = function () {
         });
     };
 
+    var accMgmtFavorites = function (obj) {
+        var data = {
+            'actionId': $(obj).data('status') === 'on' ? $(obj).data('actionid-off') : $(obj).data('actionid-on'),
+            'accountId': $(obj).data('accountid'),
+            'sk': $(obj).data('sk'),
+            'isAjax': 1
+        };
+
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: APP_ROOT + '/ajax/ajax_accFavorites.php',
+            data: data,
+            success: function (response) {
+                if (response.status === 0) {
+                    resMsg("ok", response.description);
+
+                    if ($(obj).data('status') === 'on') {
+                        $(obj).data('status', 'off');
+                        $(obj).removeClass('fg-orange80');
+                        $(obj).attr('title', LANG[49]);
+                        $(obj).html('star_border');
+                    } else if ($(obj).data('status') === 'off') {
+                        $(obj).data('status', 'on');
+                        $(obj).addClass('fg-orange80');
+                        $(obj).attr('title', LANG[50]);
+                        $(obj).html('star');
+                    }
+                } else if (response.status === 0) {
+                    resMsg("error", response.description);
+                    return true;
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                var txt = LANG[1] + '<p>' + errorThrown + textStatus + '</p>';
+                resMsg("error", txt);
+                return false;
+            }
+        });
+    };
+
     return {
         accSearch: accSearch,
         accGridAction: accGridAction,
         accGridViewPass: accGridViewPass,
+        accMgmtFavorites: accMgmtFavorites,
         appMgmtData: appMgmtData,
         appMgmtNav: appMgmtNav,
         appMgmtSave: appMgmtSave,
@@ -1418,16 +1501,16 @@ sysPass.Util.Common = function () {
         doLogin: doLogin,
         doLogout: doLogout,
         downFile: downFile,
-        dropFile: dropFile,
         encryptFormValue: encryptFormValue,
+        fileUpload: fileUpload,
         getFiles: getFiles,
-        importFile: importFile,
         linksMgmtSave: linksMgmtSave,
         linksMgmtRefresh: linksMgmtRefresh,
         navLog: navLog,
         outputResult: outputResult,
         redirect: redirect,
         resMsg: resMsg,
+        scrollUp: scrollUp,
         searchSort: searchSort,
         saveAccount: saveAccount,
         sendAjax: sendAjax,
@@ -1445,4 +1528,4 @@ sysPass.Util.Common = function () {
         LANG: LANG,
         PK: PK
     };
-}
+};

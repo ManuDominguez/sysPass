@@ -42,7 +42,7 @@ $stringsJsLang = array(
     15 => _('Eliminar archivo?'),
     16 => _('Su navegador no soporta subir archivos con HTML5'),
     17 => _('Demasiados archivos'),
-    18 => sprintf(_('No es posible guardar el archivo "%s" Tamaño máximo:'), '<br>'),
+    18 => _('Tamaño de archivo no permitido'),
     19 => _('Extensión no permitida'),
     20 => _('Vaciar el registro de eventos?'),
     21 => _('Seleccionar Grupo'),
@@ -71,5 +71,7 @@ $stringsJsLang = array(
     45 => _('Clave Copiada al Portapapeles'),
     46 => _('Error al copiar al portapapeles'),
     47 => _('Clave de Cuenta'),
-    48 => _('Recibir notificaciones?')
+    48 => _('Recibir notificaciones?'),
+    49 => _('Marcar Favorito'),
+    50 => _('Eliminar Favorito')
 );

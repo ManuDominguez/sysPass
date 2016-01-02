@@ -57,40 +57,49 @@
                 </div>
 
                 <div class="account-info">
-                    <i id="accesses-<?php echo $account->getId(); ?>" class="material-icons">face</i>
+                    <?php if ($account->isShow()): ?>
+                        <i id="accesses-<?php echo $account->getId(); ?>" class="material-icons">face</i>
 
-                    <div class="mdl-tooltip" for="accesses-<?php echo $account->getId(); ?>">
-                        <?php echo _('Permisos'), '<br>', $account->getAccesses(); ?>
-                    </div>
-
-                    <?php if (!empty($account->getNotes())): ?>
-                        <i id="notes-<?php echo $account->getId(); ?>" class="material-icons">speaker_notes</i>
-                        <div class="mdl-tooltip" for="notes-<?php echo $account->getId(); ?>">
-                            <?php echo _('Notas'), '<br>', $account->getNotes(); ?>
+                        <div class="mdl-tooltip" for="accesses-<?php echo $account->getId(); ?>">
+                            <?php echo _('Permisos'), '<br>', $account->getAccesses(); ?>
                         </div>
-                    <?php endif; ?>
 
-                    <?php if ($account->getNumFiles() > 0): ?>
-                        <i id="attachments-<?php echo $account->getId(); ?>" class="material-icons">attach_file</i>
-                        <div class="mdl-tooltip" for="attachments-<?php echo $account->getId(); ?>">
-                            <?php echo _('Archivos adjuntos'), ': ', $account->getNumFiles(); ?>
-                        </div>
-                    <?php endif; ?>
+                        <i class="material-icons fg-orange80 icon-favorite" title=""
+                           data-actionId-on="<?php echo \SP\Core\ActionsInterface::ACTION_ACC_FAVORITES_ADD; ?>"
+                           data-actionId-off="<?php echo \SP\Core\ActionsInterface::ACTION_ACC_FAVORITES_DELETE; ?>"
+                           data-accountId="<?php echo $account->getId(); ?>"
+                           data-sk="<?php echo $sk; ?>"
+                           data-status="<?php echo ($account->isFavorite()) ? 'on' : 'off'; ?>">star</i>
 
-                    <?php if (isset($wikiFilter)): ?>
-                        <?php if (preg_match('/^(' . preg_quote($wikiFilter) . ').*/i', $account->getName())): ?>
-                            <?php if (\SP\Controller\AccountsSearchData::$dokuWikiEnabled): ?>
-                                <a href="<?php echo $wikiPageUrl, $account->getName(); ?>" target="_blank">
-                                    <i class="material-icons"
-                                       title="<?php echo _('Enlace a Wiki'); ?>">library_books</i>
-                                </a>
-                                <i class="material-icons fg-green100" title="<?php echo _('Ver en Wiki'); ?>"
-                                   onClick="sysPassUtil.Common.viewWiki('<?php echo $account->getName() ?>',<?php echo \SP\Core\ActionsInterface::ACTION_WIKI_VIEW; ?>)">library_books</i>
-                            <?php else: ?>
-                                <a href="<?php echo $wikiPageUrl, $account->getName(); ?>" target="_blank">
-                                    <i class="material-icons"
-                                       title="<?php echo _('Enlace a Wiki'); ?>">library_books</i>
-                                </a>
+                        <?php if (!empty($account->getNotes())): ?>
+                            <i id="notes-<?php echo $account->getId(); ?>" class="material-icons">speaker_notes</i>
+                            <div class="mdl-tooltip" for="notes-<?php echo $account->getId(); ?>">
+                                <?php echo _('Notas'), '<br>', $account->getNotes(); ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($account->getNumFiles() > 0): ?>
+                            <i id="attachments-<?php echo $account->getId(); ?>" class="material-icons">attach_file</i>
+                            <div class="mdl-tooltip" for="attachments-<?php echo $account->getId(); ?>">
+                                <?php echo _('Archivos adjuntos'), ': ', $account->getNumFiles(); ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if (isset($wikiFilter)): ?>
+                            <?php if (preg_match('/^(' . preg_quote($wikiFilter) . ').*/i', $account->getName())): ?>
+                                <?php if (\SP\Controller\AccountsSearchData::$dokuWikiEnabled): ?>
+                                    <a href="<?php echo $wikiPageUrl, $account->getName(); ?>" target="_blank">
+                                        <i class="material-icons"
+                                           title="<?php echo _('Enlace a Wiki'); ?>">library_books</i>
+                                    </a>
+                                    <i class="material-icons fg-green100" title="<?php echo _('Ver en Wiki'); ?>"
+                                       onClick="sysPassUtil.Common.viewWiki('<?php echo $account->getName() ?>',<?php echo \SP\Core\ActionsInterface::ACTION_WIKI_VIEW; ?>)">library_books</i>
+                                <?php else: ?>
+                                    <a href="<?php echo $wikiPageUrl, $account->getName(); ?>" target="_blank">
+                                        <i class="material-icons"
+                                           title="<?php echo _('Enlace a Wiki'); ?>">library_books</i>
+                                    </a>
+                                <?php endif; ?>
                             <?php endif; ?>
                         <?php endif; ?>
                     <?php endif; ?>

@@ -47,6 +47,7 @@ if (!$sk || !SessionUtil::checkSessionKey($sk)) {
 }
 
 $Controller = new AccountsSearch();
+$Controller->setIsAjax(true);
 $Controller->getSearch();
 
 $data = array(
