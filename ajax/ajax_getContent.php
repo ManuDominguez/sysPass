@@ -166,6 +166,7 @@ switch ($actionId) {
     case ActionsInterface::ACTION_CFG_BACKUP:
     case ActionsInterface::ACTION_CFG_EXPORT:
     case ActionsInterface::ACTION_CFG_IMPORT:
+    case ActionsInterface::ACTION_CFG_LATCH:
         $Tpl->assign('onCloseAction', $actionId);
         $Tpl->addTemplate('tabs-start');
 
@@ -178,6 +179,7 @@ switch ($actionId) {
         $Controller->getBackupTab();
         $Controller->getImportTab();
         $Controller->getInfoTab();
+        $Controller->getLatchTab();
 
         $Tpl->addTemplate('tabs-end');
         break;

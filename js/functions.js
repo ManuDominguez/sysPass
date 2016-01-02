@@ -1134,7 +1134,23 @@ sysPass.Util.Common = function () {
             'sk': $(form).find('[name=sk]').val()
         };
 
-        sendAjax(data, '/ajax/ajax_checkConnection.php');
+        //sendAjax(data, '/ajax/ajax_checkConnection.php');
+        sendAjax(data, '/ajax/ajax_checkLatchConn.php');
+    };
+
+    // Función para comprobar la conexión con Latch
+    var checkLatchConn = function (formId) {
+        var form = '#' + formId;
+
+        var data = {
+            'type': 'latch',
+            'latch_id': $(form).find('[name=latch_id]').val(),
+            'latch_secret': $(form).find('[name=latch_secret]').val(),
+            'isAjax': 1,
+            'sk': $(form).find('[name=sk]').val()
+        };
+
+        sendAjax(data, '/ajax/ajax_checkLatchConn.php');
     };
 
     var checkDokuWikiConn = function (formId) {
@@ -1388,6 +1404,7 @@ sysPass.Util.Common = function () {
         appMgmtDelete: appMgmtDelete,
         checkboxDetect: checkboxDetect,
         checkDokuWikiConn: checkDokuWikiConn,
+        checkLatchConn: checkLatchConn,
         checkLdapConn: checkLdapConn,
         checkPassLevel: checkPassLevel,
         checkUpds: checkUpds,

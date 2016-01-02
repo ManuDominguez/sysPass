@@ -334,6 +334,30 @@ class ConfigMgmt extends Controller implements ActionsInterface
     }
 
     /**
+     * Obtener la pestaña de Latch
+     * @return bool
+     */
+    public function getLatchTab()
+    {
+        $this->setAction(self::ACTION_CFG_LATCH);
+
+        if (!$this->checkAccess(self::ACTION_CFG_GENERAL)) {
+            return;
+        }
+
+        $this->view->addTemplate('latch');
+
+        $this->view->assign('chkLatch', (Config::getValue('latch_enabled')) ? 'checked="checked"' : '');
+        $this->view->assign('latchId', Config::getValue('latch_id'));
+        $this->view->assign('latchSecret', Config::getValue('latch_secret'));
+
+
+        $this->view->assign('actionId', $this->getAction(), 'latch');
+        $this->view->append('tabs', array('title' => _('Latch')));
+        $this->view->assign('tabIndex', $this->getTabIndex(), 'latch');
+    }
+
+    /**
      * Obtener el índice actual de las pestañas
      *
      * @return int

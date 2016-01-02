@@ -48,7 +48,8 @@ if (!$file) {
     $Minify->addFile('clipboard.min.js');
     $Minify->addFile('zxcvbn-async.min.js');
     $Minify->addFile('jsencrypt.min.js');
-    $Minify->addFile('functions.min.js');
+    //$Minify->addFile('functions.min.js');
+    $Minify->addFile('functions.js');
     $Minify->getMinified();
 } elseif ($file && $base) {
     $base = \SP\Http\Request::analyze('b');

@@ -68,6 +68,7 @@ if ($actionId === ActionsInterface::ACTION_CFG_GENERAL
     || $actionId === ActionsInterface::ACTION_CFG_WIKI
     || $actionId === ActionsInterface::ACTION_CFG_LDAP
     || $actionId === ActionsInterface::ACTION_CFG_MAIL
+    || $actionId === ActionsInterface::ACTION_CFG_LATCH
 ) {
     $Log = Log::newLog(_('Modificar Configuración'));
 
@@ -308,6 +309,29 @@ if ($actionId === ActionsInterface::ACTION_CFG_GENERAL
         }
 
         $Log->addDetails(_('Sección'), _('Correo'));
+    } elseif ($actionId === ActionsInterface::ACTION_CFG_LATCH) {
+        // Latch
+        $latchEnabled = Request::analyze('latch_enabled', false, false, true);
+        $latchId = Request::analyze('latch_id');
+        $latchSecret = Request::analyze('latch_secret');
+
+
+        // Valores para la configuración de Latch
+        if ($latchEnabled && (!$latchId || !$latchSecret)) {
+            Response::printJSON(_('Faltan parámetros de Latch'));
+        } elseif ($latchEnabled) {
+            Config::setCacheConfigValue('latch_enabled', true);
+            Config::setCacheConfigValue('latch_id', $latchId);
+            Config::setCacheConfigValue('latch_secret', $latchSecret);
+
+            $Log->addDescription(_('Latch habilitado'));
+        } else {
+            Config::setCacheConfigValue('latch_enabled', false);
+
+            $Log->addDescription(_('Latch deshabilitado'));
+        }
+
+        $Log->addDetails(_('Sección'), _('Latch'));
     }
 
     try {

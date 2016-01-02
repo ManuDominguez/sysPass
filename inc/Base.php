@@ -32,7 +32,7 @@ define('VIEW_PATH', __DIR__ . DIRECTORY_SEPARATOR . 'themes');
 define('EXTENSIONS_PATH', __DIR__ . DIRECTORY_SEPARATOR . 'Exts');
 define('LOCALES_PATH', __DIR__ . DIRECTORY_SEPARATOR . 'locales');
 
-define('DEBUG', true);
+//define('DEBUG', true);
 
 require 'SplClassLoader.php';
 

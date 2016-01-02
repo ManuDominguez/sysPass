@@ -235,6 +235,10 @@ class Init
         $PhpMailerLoader = new \SplClassLoader('phpmailer', EXTENSIONS_PATH);
         $PhpMailerLoader->setPrepend(true);
         $PhpMailerLoader->register();
+
+        $PhpLatchLoader = new \SplClassLoader('latch', EXTENSIONS_PATH);
+        $PhpLatchLoader->setPrepend(true);
+        $PhpLatchLoader->register();
     }
 
     /**

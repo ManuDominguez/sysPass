@@ -125,5 +125,6 @@ interface ActionsInterface {
     const ACTION_CFG_WIKI = 87;
     const ACTION_CFG_LDAP = 88;
     const ACTION_CFG_MAIL = 89;
+    const ACTION_CFG_LATCH = 91;
     const ACTION_EVL = 90;
 }
