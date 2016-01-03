@@ -26,6 +26,7 @@
 namespace SP\Auth;
 
 use latch;
+use SP\Config\Config;
 
 
 defined('APP_ROOT') || die(_('No es posible acceder directamente a este archivo'));
@@ -37,11 +38,6 @@ defined('APP_ROOT') || die(_('No es posible acceder directamente a este archivo'
  */
 class AuthLatch
 {
-    //static $_appId = '';
-    //static $_secret = '';
-
-
-
     /**
      * Comprobar la conexión al servicio de Latch.
      *
@@ -67,8 +63,48 @@ class AuthLatch
 
         return true;
     }
-    /*public static function getLatchApi()
+
+    /**
+     * Parear al usuario al servicio de Latch.
+     *
+     * @param string $token     con la cadena generada en la app del móvil
+     * @return false|string     con el accountID de ese usuario
+     */
+    public static function doPair($token)
     {
-        return new Latch(self::$_appId, self::$_secret);
-    }*/
+        $appId = Config::getValue('latch_id');
+        $secret = Config::getValue('latch_secret');
+
+        try {
+            $api = new  \latch\Latch($appId, $secret);
+            $response = $api->pair($token);
+            $data = $response->getData();
+            if (!is_null($data) && property_exists($data, "accountId")) {
+                return $data->accountId;
+            } else {
+                return false;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Desparear al usuario al servicio de Latch.
+     *
+     * @param string $token     con el accountId guardado del usuario
+     *
+     */
+    public static function doUnPair($accountId)
+    {
+        $appId = Config::getValue('latch_id');
+        $secret = Config::getValue('latch_secret');
+
+        $api = new  \latch\Latch($appId, $secret);
+        $response = $api->unpair($accountId);
+
+    }
+
+
+
 }

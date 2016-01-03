@@ -34,6 +34,7 @@ use SP\Http\Response;
 use SP\Mgmt\User\UserPreferences;
 use SP\Mgmt\User\UserUtil;
 use SP\Util\Checks;
+use SP\Auth\AuthLatch;
 use SP\Util\Util;
 
 define('APP_ROOT', '..');
@@ -113,6 +114,38 @@ if ($actionId === ActionsInterface::ACTION_USR_PREFERENCES_GENERAL) {
     $UserPrefs = UserPreferences::getPreferences($itemId);
     $UserPrefs->setId($itemId);
     $UserPrefs->setUse2Fa(Util::boolval($twoFaEnabled));
+
+    if (!$UserPrefs->updatePreferences()) {
+        Response::printJSON(_('Error al actualizar preferencias'));
+    }
+
+    Response::printJSON(_('Preferencias actualizadas'), 0, $doActionOnClose);
+} else if ($actionId === ActionsInterface::ACTION_USR_PREFERENCES_LATCH) {
+    if (Checks::demoIsEnabled() && Session::getUserLogin() === 'demo') {
+        Response::printJSON(_('Ey, esto es una DEMO!!'));
+    }
+
+    // Variables POST del formulario
+    $latchEnabled = Request::analyze('latch_enabled', 0, false, 1);
+    $pin = Request::analyze('latch_pin');
+
+    if ($latchEnabled == true){
+        $accountId = AuthLatch::doPair($pin);
+
+        if ($accountId === false) {
+            Response::printJSON(_('Error de pareado, compruebe el token'));
+        }
+    }else{
+        $accountId = '';
+    }
+
+    // No se instancia la clase ya que es necesario guardar los atributos ya guardados
+    $UserPrefs = UserPreferences::getPreferences($itemId);
+    $UserPrefs->setId($itemId);
+    if (($latchEnabled == false) && ($UserPrefs->getLatchAccountId() != '')){
+        AuthLatch::doUnPair($UserPrefs->getLatchAccountId());
+    }
+    $UserPrefs->setLatchAccountId($accountId);
 
     if (!$UserPrefs->updatePreferences()) {
         Response::printJSON(_('Error al actualizar preferencias'));

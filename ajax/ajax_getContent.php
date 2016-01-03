@@ -190,11 +190,15 @@ switch ($actionId) {
     case ActionsInterface::ACTION_USR_PREFERENCES:
     case ActionsInterface::ACTION_USR_PREFERENCES_GENERAL:
     case ActionsInterface::ACTION_USR_PREFERENCES_SECURITY:
+    case ActionsInterface::ACTION_USR_PREFERENCES_LATCH:
         $Tpl->addTemplate('tabs-start');
 
         $Controller = new \SP\Controller\UsersPrefs($Tpl);
         $Controller->getPreferencesTab();
         $Controller->getSecurityTab();
+        if (Config::getValue('latch_enabled')) {
+            $Controller->getUserLatchTab();
+        }
 
         $Tpl->addTemplate('tabs-end');
         break;

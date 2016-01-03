@@ -98,6 +98,22 @@ class UsersPrefs extends Controller implements ActionsInterface
     }
 
     /**
+     * Obtener la pestaña de Latch
+     */
+    public function getUserLatchTab()
+    {
+        $this->setAction(self::ACTION_USR_PREFERENCES_LATCH);
+
+        $this->view->addTemplate('userlatch');
+
+        $this->view->assign('userId', $this->_userId);
+        $this->view->assign('chkLatchEnabled', $this->_userPrefs->isLatched());
+
+        $this->view->append('tabs', array('title' => _('Latch')));
+        $this->view->assign('tabIndex', $this->getTabIndex(), 'userlatch');
+        $this->view->assign('actionId', $this->getAction(), 'userlatch');
+    }
+    /**
      * Obtener el índice actual de las pestañas
      *
      * @return int

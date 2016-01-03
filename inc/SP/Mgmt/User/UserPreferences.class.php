@@ -81,6 +81,12 @@ class UserPreferences
      * @var bool
      */
     private $_optionalActions = false;
+    /**
+     * Latch accountId
+     *
+     * @var string
+     */
+    private $_latchAccountId = '';
 
     /**
      * Obtener las preferencas de un usuario
@@ -279,5 +285,31 @@ class UserPreferences
         $this->_id = $id;
     }
 
+    /**
+     * @return string
+     */
+    public function getLatchAccountId()
+    {
+        return $this->_latchAccountId;
+    }
 
+    /**
+     * @param string $accountId
+     */
+    public function setLatchAccountId($accountId)
+    {
+        $this->_latchAccountId = $accountId;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isLatched()
+    {
+        if ($this->_latchAccountId === '') {
+            return false;
+        }
+
+        return true;
+    }
 }
