@@ -1,4 +1,5 @@
 <!-- Start Tab - Config -->
+<?php /** @var $icons \Theme\Icons */ ?>
 <div id="tabs-<?php echo $config_tabIndex; ?>">
 
     <form method="post" name="frmConfig" id="frmConfig"
@@ -24,15 +25,26 @@
 
     <div class="action">
         <button form="frmConfig"
-                class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored bg-green80"
-                title="<?php echo _('Guardar'); ?>">
-            <i class="material-icons">save</i>
+                class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored <?php echo $icons->getIconSave()->getClassButton(); ?>"
+                title="<?php echo $icons->getIconSave()->getTitle(); ?>">
+            <i class="material-icons"><?php echo $icons->getIconSave()->getIcon(); ?></i>
         </button>
     </div>
 </div> <!-- End Tab - Config -->
 
 <script>
     $(function () {
+        // Mostrar un aviso tras añadir una etiqueta a la lista
+        var showTagWarning = function (obj) {
+            // Fix scrolling to bottom
+            var $tagsbox = obj.next();
+            $tagsbox.animate({scrollTop: $tagsbox.height()});
+
+            if (!$tagsbox.find('span').hasClass('icon')) {
+                $tagsbox.find('div:last').prev().append('<span class="icon material-icons <?php echo $icons->getIconWarning()->getClass(); ?>" title="' + sysPassUtil.Common.LANG[5] + '"><?php echo $icons->getIconWarning()->getIcon(); ?></span>');
+            }
+        };
+
         $('#allowed_exts').tagsInput({
             'width': '350px',
             'defaultText': '<?php echo _('Añadir extensión'); ?>',
@@ -41,20 +53,10 @@
             'tagsToUpper': true,
             'maxChars': 4,
             'onAddTag': function () {
-                // Fix scrolling to bottom
-                var $tagsbox = $(this).next();
-                $tagsbox.animate({scrollTop: $tagsbox.height()});
-
-                if (!$tagsbox.find('div').hasClass('icon')) {
-                    $tagsbox.find('div:last').prev().append('<div class="icon material-icons fg-orange80" title="' + LANG[5] + '">warning</div>');
-                }
+                showTagWarning($(this))
             },
             'onRemoveTag': function () {
-                var $tagsbox = $(this).next();
-
-                if (!$tagsbox.find('div').hasClass('icon')) {
-                    $tagsbox.find('div:last').prev().append('<div class="icon material-icons fg-orange80" title="' + LANG[5] + '">warning</div>');
-                }
+                showTagWarning($(this))
             }
         });
     })

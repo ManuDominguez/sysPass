@@ -102,7 +102,7 @@ class Util
      */
     public static function getVersionString()
     {
-        return '1.2-dev';
+        return '1.3-dev';
     }
 
     /**
@@ -140,11 +140,13 @@ class Util
         $description = $updateInfo->body;
         $date = $updateInfo->published_at;
 
-        preg_match('/v?(\d+)\.(\d+)\.(\d+)\.(\d+)(\-[a-z0-9.]+)?$/', $version, $realVer);
+//        preg_match('/v?(\d+)\.(\d+)\.(\d+)\.(\d+)(\-[a-z0-9.]+)?$/', $version, $realVer);
+        preg_match('/v?(\d+)\.(\d+)\.(\d+)(\-[a-z0-9.]+)?$/', $version, $realVer);
 
         if (is_array($realVer) && Init::isLoggedIn()) {
             $appVersion = implode('', self::getVersion(true));
-            $pubVersion = $realVer[1] . $realVer[2] . $realVer[3] . $realVer[4];
+//            $pubVersion = $realVer[1] . $realVer[2] . $realVer[3] . $realVer[4];
+            $pubVersion = $realVer[1] . $realVer[2] . $realVer[3];
 
             if ($pubVersion > $appVersion) {
                 return array(
@@ -272,8 +274,8 @@ class Util
      */
     public static function getVersion($retBuild = false)
     {
-        $build = '02';
-        $version = array(1, 2, 1);
+        $build = '16011001';
+        $version = array(1, 3);
 
         if ($retBuild) {
             array_push($version, $build);
