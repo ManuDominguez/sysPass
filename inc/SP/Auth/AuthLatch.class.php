@@ -116,7 +116,7 @@ class AuthLatch
      */
     public static function doLogin($accountId)
     {
-        if (Config::getValue('latch_enabled')){
+        if (Config::getValue('latch_enabled') == true){
 
             $appId = Config::getValue('latch_id');
             $secret = Config::getValue('latch_secret');
