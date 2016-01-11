@@ -401,6 +401,27 @@ class Main extends Controller implements ActionsInterface
     }
 
     /**
+     * Obtener los datos para el interface de autenticación en 2 pasos de Latch
+     */
+    public function getLatch2FA()
+    {
+        if (Request::analyze('f', 0) === 1) {
+            $this->view->addTemplate('latch2fa');
+
+            $this->view->assign('action', Request::analyze('a'));
+            $this->view->assign('userId', Request::analyze('i'));
+            $this->view->assign('time', Request::analyze('t'));
+        } else {
+            $this->view->assign('showLogo', true);
+
+            $this->showError(self::ERR_UNAVAILABLE, false);
+        }
+
+        $this->view->addTemplate('footer');
+        $this->view->addTemplate('body-end');
+    }
+
+    /**
      * Obtener los datos para el interface de comprobación de actualizaciones
      */
     public function getCheckUpdates()

@@ -625,6 +625,10 @@ class Init
                 $Controller->getPublicLink();
                 $Controller->view();
                 break;
+            case 'latch':
+                $Controller->getLatch2FA();
+                $Controller->view();
+                break;
             default:
                 return false;
         }
@@ -640,7 +644,7 @@ class Init
     public static function isLoggedIn()
     {
         if (Session::getUserLogin()
-            && Session::get2FApassed()
+            && Session::get2FApassed() && Session::getLatchpassed()
         ) {
             return true;
         }

@@ -748,4 +748,44 @@ class Session
     {
         self::setSessionKey('sessiontype', $type);
     }
+
+    /**
+     * Establece si el usuario ha pasado la autenticación de Latch
+     *
+     * @param bol $passed
+     */
+    public static function setLatchPassed($passed)
+    {
+        self::setSessionKey('latchpass', $passed);
+    }
+
+    /**
+     * Devuelve si el usuario ha pasado la autentificación de Latch
+     *
+     * @return bool
+     */
+    public static function getLatchpassed()
+    {
+        return self::getSessionKey('latchpass', false);
+    }
+
+    /**
+     * Establece el token 2fa que ha pasado la autenticación de Latch
+     *
+     * @param string $token
+     */
+    public static function setLatch2fa($token)
+    {
+        self::setSessionKey('latch2fa', $token);
+    }
+
+    /**
+     * Devuelve el token 2fa que ha pasado la autenticación de Latch
+     *
+     * @return string
+     */
+    public static function getLatch2fa()
+    {
+        return self::getSessionKey('latch2fa', false);
+    }
 }

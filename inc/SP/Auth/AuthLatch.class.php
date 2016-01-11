@@ -52,13 +52,16 @@ class AuthLatch
             $api = new  \latch\Latch($appId, $secret);
             $operationsResponse = $api->getOperations();
             $errorConn = $operationsResponse->getError();
+            $data = $operationsResponse->getData();
             if (!is_null($errorConn)) {
-                return $errorConn->getCode() .' ' . $errorConn->getMessage();
+                return $errorConn->getCode() . ' ' . $errorConn->getMessage();
+            }elseif (is_null($data)){
+                return _('No hay conexión');
             }else{
                 return true;
             }
         } catch (\Exception $e) {
-            return "Indefinido";
+            return _("Indefinido");
         }
 
         return true;
@@ -92,7 +95,7 @@ class AuthLatch
     /**
      * Desparear al usuario al servicio de Latch.
      *
-     * @param string $token     con el accountId guardado del usuario
+     * @param string $accountId     con el accountId guardado del usuario
      *
      */
     public static function doUnPair($accountId)
@@ -105,6 +108,36 @@ class AuthLatch
 
     }
 
+    /**
+     * Comprobar el estado del latch del usuario.
+     *
+     * @param string $accountId     con el accountId guardado del usuario
+     *
+     */
+    public static function doLogin($accountId)
+    {
+        if (Config::getValue('latch_enabled')){
 
+            $appId = Config::getValue('latch_id');
+            $secret = Config::getValue('latch_secret');
 
+            $api = new  \latch\Latch($appId, $secret);
+            $status = $api->status($accountId);
+            if (!empty($status) && $status->getData() != null) {
+                $operations = $status->getData()->operations;
+                $operation = $operations->$appId;
+                if ($operation->status == "on" && property_exists($operation, "two_factor")) {
+                    return $operation->two_factor->token;
+                }
+                return $operation->status;
+            } else {
+                if (Config::getValue('latch_fail') == 1){
+                    return "off";
+                }else{
+                    return "on";
+                }
+            }
+        }
+        return "on";
+    }
 }

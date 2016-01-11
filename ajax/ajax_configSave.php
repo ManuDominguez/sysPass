@@ -314,6 +314,7 @@ if ($actionId === ActionsInterface::ACTION_CFG_GENERAL
         $latchEnabled = Request::analyze('latch_enabled', false, false, true);
         $latchId = Request::analyze('latch_id');
         $latchSecret = Request::analyze('latch_secret');
+        $latchFail = Request::analyze('faillatch',1);
 
 
         // Valores para la configuración de Latch
@@ -323,6 +324,7 @@ if ($actionId === ActionsInterface::ACTION_CFG_GENERAL
             Config::setCacheConfigValue('latch_enabled', true);
             Config::setCacheConfigValue('latch_id', $latchId);
             Config::setCacheConfigValue('latch_secret', $latchSecret);
+            Config::setCacheConfigValue('latch_fail', $latchFail);
 
             $Log->addDescription(_('Latch habilitado'));
         } else {

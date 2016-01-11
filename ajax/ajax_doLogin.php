@@ -25,6 +25,7 @@
 
 use SP\Auth\Auth;
 use SP\Auth\Ldap;
+use SP\Auth\AuthLatch;
 use SP\Core\CryptMasterPass;
 use SP\Core\Init;
 use SP\Core\Language;
@@ -211,6 +212,12 @@ if ($User->getUserMPass()) {
 
 $UserPrefs = \SP\Mgmt\User\UserPreferences::getPreferences($User->getUserId());
 
+Language::setLanguage(true);
+Themes::setTheme(true);
+Session::setUserPreferences($UserPrefs);
+Session::setSessionType(Session::SESSION_INTERACTIVE);
+
+
 if ($UserPrefs->isUse2Fa()) {
     Session::set2FApassed(false);
     $url = Init::$WEBURI . '/index.php?a=2fa&i=' . $User->getUserId() . '&t=' . time() . '&f=1';
@@ -219,9 +226,31 @@ if ($UserPrefs->isUse2Fa()) {
     Session::set2FApassed(true);
 }
 
-Language::setLanguage(true);
-Themes::setTheme(true);
-Session::setUserPreferences($UserPrefs);
-Session::setSessionType(Session::SESSION_INTERACTIVE);
+if ($UserPrefs->isLatched()) {
+    $statusLatch = AuthLatch::doLogin($UserPrefs->getLatchAccountId());
+    switch ($statusLatch){
+        case 'on':
+            Session::setLatchPassed(true);
+            break;
+        case 'off':
+            Session::setLatchPassed(false);
+            $Log->resetDescription();
+            $Log->addDescription('(Latch)');
+            $Log->addDescription(_('Login incorrecto'));
+            $Log->addDetails(_('Usuario'), $userLogin);
+            $Log->writeLog();
+            Response::printJSON(_('Usuario/Clave incorrectos'));
+            break;
+        default: // 2fa
+            Session::setLatchPassed(false);
+            Session::setLatch2fa($statusLatch);
+            $url = Init::$WEBURI . '/index.php?a=latch&i=' . $User->getUserId() . '&t=' . time() . '&f=1';
+            Response::printJSON($url, 0);
+            break;
+    }
+} else {
+    Session::setLatchPassed(true);
+}
+
 
 Response::printJSON('index.php?' . $urlParams, 0);

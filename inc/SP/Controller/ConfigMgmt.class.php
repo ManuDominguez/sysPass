@@ -350,6 +350,11 @@ class ConfigMgmt extends Controller implements ActionsInterface
         $this->view->assign('chkLatch', (Config::getValue('latch_enabled')) ? 'checked="checked"' : '');
         $this->view->assign('latchId', Config::getValue('latch_id'));
         $this->view->assign('latchSecret', Config::getValue('latch_secret'));
+        $latchAvailable = array();
+        $latchAvailable[1] = _('Fallo de autenticación');
+        $latchAvailable[2] = _('Continuar sin Latch');
+        $this->view->assign('latchFail', Config::getValue('latch_fail'));
+        $this->view->assign('latchAvailable', $latchAvailable);
 
 
         $this->view->assign('actionId', $this->getAction(), 'latch');

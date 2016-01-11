@@ -55,6 +55,26 @@
             </tr>
             <tr>
                 <td class="descField">
+                    <?php echo _('Fallo servicios Latch'); ?>
+                    <div id="help-latch-available" class="icon material-icons fg-blue80">help_outline</div>
+                    <div class="mdl-tooltip mdl-tooltip--large" for="help-latch-available">
+                        <p>
+                            <?php echo _('Qué hacer en caso de fallo en los servicios de Latch'); ?>
+                        </p>
+                    </div>
+                </td>
+                <td class="valField">
+                    <select id="sel-faillatch" name="faillatch"
+                            class="sel-chosen-ns" <?php echo $isDisabled; ?> required>
+                        <option value="1"></option>
+                        <?php foreach ($latchAvailable as $id => $name): ?>
+                            <option value="<?php echo $id; ?>" <?php echo ($id === $latchFail) ? 'selected' : ''; ?>><?php echo $name; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="descField">
                     <?php echo _('Comprobar'); ?>
                 </td>
                 <td class="valField">
