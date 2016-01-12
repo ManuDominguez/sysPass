@@ -1172,8 +1172,7 @@ sysPass.Util.Common = function () {
             'sk': $(form).find('[name=sk]').val()
         };
 
-        //sendAjax(data, '/ajax/ajax_checkConnection.php');
-        sendAjax(data, '/ajax/ajax_checkLatchConn.php');
+        sendAjax(data, '/ajax/ajax_checkConnection.php');
     };
 
     // Función para comprobar la conexión con Latch
