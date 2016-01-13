@@ -83,8 +83,8 @@ class UserPreferences
     private $_optionalActions = false;
     /**
      * Latch accountId
-     *
      * @var string
+     * @author Manuel Domínguez <manu.dg@gmail.com>
      */
     private $_latchAccountId = '';
 
@@ -287,6 +287,7 @@ class UserPreferences
 
     /**
      * @return string
+     * @author Manuel Domínguez <manu.dg@gmail.com>
      */
     public function getLatchAccountId()
     {
@@ -295,6 +296,7 @@ class UserPreferences
 
     /**
      * @param string $accountId
+     * @author Manuel Domínguez <manu.dg@gmail.com>
      */
     public function setLatchAccountId($accountId)
     {
@@ -303,6 +305,7 @@ class UserPreferences
 
     /**
      * @return boolean
+     * @author Manuel Domínguez <manu.dg@gmail.com>
      */
     public function isLatched()
     {

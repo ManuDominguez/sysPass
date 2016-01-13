@@ -4,7 +4,7 @@
  *
  * @author    Manuel Domínguez
  * @link      http://syspass.org
- * @copyright 2012-2015 Rubén Domínguez nuxsmin@syspass.org
+ * @copyright 2012-2016 Manuel Domínguez manu.dg@gmail.com
  *
  * This file is part of sysPass.
  *

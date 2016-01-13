@@ -1176,6 +1176,7 @@ sysPass.Util.Common = function () {
     };
 
     // Función para comprobar la conexión con Latch
+    // @author Manuel Domínguez <manu.dg@gmail.com>
     var checkLatchConn = function (formId) {
         var form = '#' + formId;
 

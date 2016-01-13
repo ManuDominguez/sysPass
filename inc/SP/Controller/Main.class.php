@@ -402,6 +402,7 @@ class Main extends Controller implements ActionsInterface
 
     /**
      * Obtener los datos para el interface de autenticación en 2 pasos de Latch
+     * @author Manuel Domínguez <manu.dg@gmail.com>
      */
     public function getLatch2FA()
     {

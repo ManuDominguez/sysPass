@@ -4,7 +4,7 @@
  *
  * @author    Manuel Domínguez
  * @link      http://syspass.org
- * @copyright 2012-2015 Rubén Domínguez nuxsmin@syspass.org
+ * @copyright 2012-2016 Manuel Domínguez manu.dg@gmail.com
  *
  * This file is part of sysPass.
  *
@@ -46,19 +46,18 @@ if (!$sk || !SessionUtil::checkSessionKey($sk)) {
 }
 $frmType = Request::analyze('type');
 
-//if ($frmType === 'latch') {
-    $frmLatchId = Request::analyze('latch_id');
-    $frmLatchSecret = Request::analyze('latch_secret');
 
-    if (!$frmLatchId || !$frmLatchSecret) {
-        Response::printJSON(_('Los parámetros de Latch no están configurados'));
-    }
+$frmLatchId = Request::analyze('latch_id');
+$frmLatchSecret = Request::analyze('latch_secret');
 
-    $resCheckLatch = AuthLatch::checkLatchConn($frmLatchId,$frmLatchSecret);
+if (!$frmLatchId || !$frmLatchSecret) {
+    Response::printJSON(_('Los parámetros de Latch no están configurados'));
+}
 
-    if ($resCheckLatch === true) {
-        Response::printJSON(_('Conexión a Latch correcta'),0);
-    } else {
-        Response::printJSON(_('Error de conexión a Latch') . ';;' . _('Error') . ': ' . $resCheckLatch);
-    }
-//}
+$resCheckLatch = AuthLatch::checkLatchConn($frmLatchId,$frmLatchSecret);
+
+if ($resCheckLatch === true) {
+    Response::printJSON(_('Conexión a Latch correcta'),0);
+} else {
+    Response::printJSON(_('Error de conexión a Latch') . ';;' . _('Error') . ': ' . $resCheckLatch);
+}

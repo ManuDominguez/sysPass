@@ -336,6 +336,7 @@ class ConfigMgmt extends Controller implements ActionsInterface
     /**
      * Obtener la pestaña de Latch
      * @return bool
+     * @author Manuel Domínguez <manu.dg@gmail.com>
      */
     public function getLatchTab()
     {

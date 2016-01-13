@@ -4,7 +4,7 @@
  *
  * @author    Manuel Domínguez
  * @link      http://syspass.org
- * @copyright 2012-2015 Rubén Domínguez nuxsmin@syspass.org
+ * @copyright 2012-2016 Manuel Domínguez manu.dg@gmail.com
  *
  * This file is part of sysPass.
  *
@@ -44,6 +44,7 @@ class AuthLatch
      * @param string $appId     con el Id de la app
      * @param string $secret    con el secreto
      * @return false|int        con el número de operaciones encontradas
+     * @author Manuel Domínguez <manu.dg@gmail.com>
      */
     public static function checkLatchConn($appId, $secret)
     {
@@ -72,6 +73,7 @@ class AuthLatch
      *
      * @param string $token     con la cadena generada en la app del móvil
      * @return false|string     con el accountID de ese usuario
+     * @author Manuel Domínguez <manu.dg@gmail.com>
      */
     public static function doPair($token)
     {
@@ -96,6 +98,7 @@ class AuthLatch
      * Desparear al usuario al servicio de Latch.
      *
      * @param string $accountId     con el accountId guardado del usuario
+     * @author Manuel Domínguez <manu.dg@gmail.com>
      *
      */
     public static function doUnPair($accountId)
@@ -112,6 +115,7 @@ class AuthLatch
      * Comprobar el estado del latch del usuario.
      *
      * @param string $accountId     con el accountId guardado del usuario
+     * @author Manuel Domínguez <manu.dg@gmail.com>
      *
      */
     public static function doLogin($accountId)

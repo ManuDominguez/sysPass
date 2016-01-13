@@ -98,6 +98,7 @@ class UsersPrefs extends Controller implements ActionsInterface
 
     /**
      * Obtener la pestaña de Latch
+     * @author Manuel Domínguez <manu.dg@gmail.com>
      */
     public function getUserLatchTab()
     {
